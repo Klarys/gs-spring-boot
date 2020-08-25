@@ -2,7 +2,7 @@ version: 2.1
 jobs:
   build:
     docker:
-     - image: raspbian/stretch
+       - image: circleci/ruby:2.4.2-jessie-node
 
       steps:  # Commands run in a Linux virtual machine environment
 
