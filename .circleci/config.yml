@@ -9,9 +9,7 @@ jobs: # a collection of steps
 
     steps:  # Commands run in a Linux virtual machine environment
 
-      - run:
-          name: Intall updates
-          command: apt-get update && apt-get install -y build-essential libssl-dev uuid-dev libgpgme11-dev squashfs-tools libseccomp-dev wget pkg-config git cryptsetup
+      - run: apt-get update && apt-get install -y build-essential libssl-dev uuid-dev libgpgme11-dev squashfs-tools libseccomp-dev wget pkg-config git cryptsetup
       - run:
             #Intall Go  
             name: Intall Go
