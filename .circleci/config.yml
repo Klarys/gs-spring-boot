@@ -1,57 +1,34 @@
-version: 2.0
-jobs:
-  build:
-    docker:
-      image: circleci/ruby:2.4.2-jessie-node
+version: 2 # use CircleCI 2.0
+jobs: # a collection of steps
+  build: # runs not using Workflows must have a `build` job as entry point
+    
+    working_directory: ~/circleci-demo-java-spring # directory where steps will run
 
-      steps:  # Commands run in a Linux virtual machine environment
+    docker: # run the steps with Docker
+      - image: circleci/openjdk:8-jdk-stretch # ...with this image as the primary container; this is where all `steps` will run
 
-        - run:
-            # Update
-            name: Intall updates
-            command: apt-get update && apt-get install -y build-essential libssl-dev uuid-dev libgpgme11-dev squashfs-tools libseccomp-dev wget pkg-config git cryptsetup
-        - run:
-            #Intall Go  
-            name: Intall Go
-            command: wget https://golang.org/dl/go1.15.linux-armv6l.tar.gz
-                     tar -zxvf go1.15.linux-armv6l.tar.gz -C /usr/local/
-                     echo 'export GOPATH=${HOME}/go' >> ~/.bashrc
-                     echo 'export PATH=/usr/local/go/bin:${PATH}:${GOPATH}/bin' >> ~/.bashrc
-                     source ~/.bashrc
-        - run:
-            #Intall Singularity
-            name: Intall Singularity
-            command: export VERSION=3.6.0 && wget https://github.com/sylabs/singularity/releases/download/v${VERSION}/singularity-${VERSION}.tar.gz && tar -xzf singularity-${VERSION}.tar.gz && cd singularity
-                    ./mconfig && make -C builddir && make -C builddir install
-        - run:
-            #Intall maven
-            name: Intall Maven
-            command:
+    steps: # a collection of executable commands
 
-        - run: 
-            #Intall openjdk-11
-            name: Install openjdk
-            command:  wget -P /opt/jdk/ http://cdn.azul.com/zulu-embedded/bin/zulu11.31.16-ca-jdk11.0.3-linux_aarch32hf.tar.gz
-                      tar -zxvf /opt/jdk/zulu11.31.16-ca-jdk11.0.3-linux_aarch32hf.tar.gz -C /opt/jdk
-                      rm /opt/jdk/zulu11.31.16-ca-jdk11.0.3-linux_aarch32hf.tar.gz
-                      update-alternatives --install /usr/bin/java java /opt/jdk/zulu11.31.16-ca-jdk11.0.3-linux_aarch32hf/bin/java 1
-                      update-alternatives --install /usr/bin/javac javac /opt/jdk/zulu11.31.16-ca-jdk11.0.3-linux_aarch32hf/bin/javac 1
-        - run:
-            #Build the application
-            name: Build Jar
-            command: mvn clean install
+      - checkout # check out source code to working directory
 
-        - run:
-            #Download the .def file
-            name: Download .def
-            command: 
-
-        - run:
-            #Build the .sif file
-            name: Build .sif
-            command:
-
-        - run:
-            #Send .sif to IBM COS and update IoT
-            name: Upload Sif and update IoT
-            command: 
+      - restore_cache: # restore the saved cache after the first run or if `pom.xml` has changed
+          # Read about caching dependencies: https://circleci.com/docs/2.0/caching/
+          key: circleci-demo-java-spring-{{ checksum "pom.xml" }}
+      
+      - run: mvn dependency:go-offline # gets the project dependencies
+      
+      - save_cache: # saves the project dependencies
+          paths:
+            - ~/.m2
+          key: circleci-demo-java-spring-{{ checksum "pom.xml" }}
+      
+      - run: mvn package # run the actual tests
+      
+      - store_test_results: # uploads the test metadata from the `target/surefire-reports` directory so that it can show up in the CircleCI dashboard. 
+      # Upload test results for display in Test Summary: https://circleci.com/docs/2.0/collect-test-data/
+          path: target/surefire-reports
+      
+      - store_artifacts: # store the uberjar as an artifact
+      # Upload test summary for display in Artifacts: https://circleci.com/docs/2.0/artifacts/
+          path: target/demo-java-spring-0.0.1-SNAPSHOT.jar
+      # See https://circleci.com/docs/2.0/deployment-integrations/ for deploy examples    
