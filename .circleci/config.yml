@@ -1,14 +1,14 @@
 version: 2 # use CircleCI 2.0
 jobs: # a collection of steps
   build: # runs not using Workflows must have a `build` job as entry point
-    
-    working_directory: ~/circleci-demo-java-spring # directory where steps will run
-
     docker: # run the steps with Docker
       - image: raspbian/stretch
 
     steps:  # Commands run in a Linux virtual machine environment
-      - run: apt-get update && apt-get install -y build-essential libssl-dev uuid-dev libgpgme11-dev squashfs-tools libseccomp-dev wget pkg-config git cryptsetup
+      - run:
+            # Update
+            name: Intall updates
+            command: apt-get update && apt-get install -y build-essential libssl-dev uuid-dev libgpgme11-dev squashfs-tools libseccomp-dev wget pkg-config git cryptsetup
       - run:
             #Intall Go  
             name: Intall Go
