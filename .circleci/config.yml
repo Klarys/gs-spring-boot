@@ -1,7 +1,7 @@
 version: 2 # use CircleCI 2.0
-jobs: # a collection of steps
-  build: # runs not using Workflows must have a `build` job as entry point
-    docker: # run the steps with Docker
+jobs:
+  build:
+    docker:
       - image: raspbian/stretch
 
     steps:
@@ -11,50 +11,50 @@ jobs: # a collection of steps
           command: echo "Hi"
       - run:
           # Update
-          name: Intall updates
+          name: Install updates
           command: apt-get update && apt-get install -y build-essential libssl-dev uuid-dev libgpgme11-dev squashfs-tools libseccomp-dev wget pkg-config git cryptsetup
       - run:
           #Intall Go  
           name: Intall Go
           command: wget https://golang.org/dl/go1.15.linux-armv6l.tar.gz
-                    tar -zxvf go1.15.linux-armv6l.tar.gz -C /usr/local/
-                     echo 'export GOPATH=${HOME}/go' >> ~/.bashrc
-                     echo 'export PATH=/usr/local/go/bin:${PATH}:${GOPATH}/bin' >> ~/.bashrc
-                     source ~/.bashrc
+            tar -zxvf go1.15.linux-armv6l.tar.gz -C /usr/local/
+            echo 'export GOPATH=${HOME}/go' >> ~/.bashrc
+            echo 'export PATH=/usr/local/go/bin:${PATH}:${GOPATH}/bin' >> ~/.bashrc
+            source ~/.bashrc
       - run:
-            #Intall Singularity
-            name: Intall Singularity
-            command: export VERSION=3.6.0 && wget https://github.com/sylabs/singularity/releases/download/v${VERSION}/singularity-${VERSION}.tar.gz && tar -xzf singularity-${VERSION}.tar.gz && cd singularity
-                    ./mconfig && make -C builddir && make -C builddir install
+          #Intall Singularity
+          name: Intall Singularity
+          command: export VERSION=3.6.0 && wget https://github.com/sylabs/singularity/releases/download/v${VERSION}/singularity-${VERSION}.tar.gz && tar -xzf singularity-${VERSION}.tar.gz && cd singularity
+            ./mconfig && make -C builddir && make -C builddir install
       - run:
-            #Intall maven
-            name: Intall Maven
-            command:
+          #Intall maven
+          name: Intall Maven
+          command:
 
       - run: 
-            #Intall openjdk-11
-            name: Install openjdk
-            command:  wget -P /opt/jdk/ http://cdn.azul.com/zulu-embedded/bin/zulu11.31.16-ca-jdk11.0.3-linux_aarch32hf.tar.gz
-                      tar -zxvf /opt/jdk/zulu11.31.16-ca-jdk11.0.3-linux_aarch32hf.tar.gz -C /opt/jdk
-                      rm /opt/jdk/zulu11.31.16-ca-jdk11.0.3-linux_aarch32hf.tar.gz
-                      update-alternatives --install /usr/bin/java java /opt/jdk/zulu11.31.16-ca-jdk11.0.3-linux_aarch32hf/bin/java 1
-                      update-alternatives --install /usr/bin/javac javac /opt/jdk/zulu11.31.16-ca-jdk11.0.3-linux_aarch32hf/bin/javac 1
+          #Intall openjdk-11
+          name: Install openjdk
+          command:  wget -P /opt/jdk/ http://cdn.azul.com/zulu-embedded/bin/zulu11.31.16-ca-jdk11.0.3-linux_aarch32hf.tar.gz
+            tar -zxvf /opt/jdk/zulu11.31.16-ca-jdk11.0.3-linux_aarch32hf.tar.gz -C /opt/jdk
+            rm /opt/jdk/zulu11.31.16-ca-jdk11.0.3-linux_aarch32hf.tar.gz
+            update-alternatives --install /usr/bin/java java /opt/jdk/zulu11.31.16-ca-jdk11.0.3-linux_aarch32hf/bin/java 1
+            update-alternatives --install /usr/bin/javac javac /opt/jdk/zulu11.31.16-ca-jdk11.0.3-linux_aarch32hf/bin/javac 1
        - run:
-            #Build the application
-            name: Build Jar
-            command: mvn clean install
+          #Build the application
+          name: Build Jar
+          command: mvn clean install
 
        - run:
-            #Download the .def file
-            name: Download .def
-            command: 
+          #Download the .def file
+          name: Download .def
+          command: 
 
        - run:
-            #Build the .sif file
-            name: Build .sif
-            command:
+          #Build the .sif file
+          name: Build .sif
+          command:
 
        - run:
-            #Send .sif to IBM COS and update IoT
-            name: Upload Sif and update IoT
-            command: 
+          #Send .sif to IBM COS and update IoT
+          name: Upload Sif and update IoT
+          command: 
